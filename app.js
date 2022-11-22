@@ -1,7 +1,30 @@
 const express = require("express");
 const app = express();
 
-const router = require("./router");
-app.use("/", router);
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use("/", require("./router"));
 
-app.listen(8080);
+require("dotenv").config();
+const mongoose = require("mongoose");
+//configure mongoose
+mongoose.connect(
+  process.env.CONNECTIONSTRING,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Connected to MongoDB");
+    }
+  }
+);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
+});
+
+module.exports = app;
