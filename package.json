@@ -1,0 +1,17 @@
+{
+  "name": "cool-social-network-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Cool Social Network app",
+  "main": "index.js",
+  "scripts": {
+    "watch": "nodemon app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  }
+}
