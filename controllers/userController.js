@@ -33,3 +33,66 @@ exports.login = async (req, res) => {
       res.status(500).send(err);
     });
 };
+
+exports.checkToken = async (req, res) => {
+  try {
+    req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
+    res.json(true);
+  } catch {
+    res.json(false);
+  }
+};
+
+exports.checkIfUsernameExists = async (req, res) => {
+  userService
+    .findByUsername(req.body)
+    .then((isFound) => {
+      res.json({ usernameExists: isFound });
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+};
+
+exports.checkIfEmailExists = async (req, res) => {
+  userService
+    .findByEmail(req.body)
+    .then((isFound) => {
+      res.json({ emailExists: isFound });
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+};
+
+exports.ifUserExists = function (req, res, next) {
+  userService
+    .findByUsername(req.params)
+    .then(function (userDocument) {
+      req.profileUser = userDocument;
+      next();
+    })
+    .catch(function (e) {
+      res.json(false);
+    });
+};
+
+exports.isLoggedIn = function (req, res, next) {
+  try {
+    req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
+    next();
+  } catch (e) {
+    res.status(500).send("Sorry, you must provide a valid token.");
+  }
+};
+
+exports.deleteAccount = async (req, res) => {
+  userService
+    .deleteAccount(req.body.id)
+    .then((res) => {
+      res.json(res);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+};

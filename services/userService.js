@@ -3,8 +3,12 @@ const crypto = require("crypto");
 const validator = require("validator");
 
 const prepareUserData = (userData) => {
-  userData.username = userData.username.trim();
-  userData.email = userData.email.trim().toLowerCase();
+  if (userData.username) {
+    userData.username = userData.username.trim();
+  }
+  if (userData.email) {
+    userData.email = userData.email.trim().toLowerCase();
+  }
   return userData;
 };
 
@@ -71,6 +75,7 @@ exports.register = function (userData) {
 
 exports.login = function (userData) {
   return new Promise(async (resolve, reject) => {
+    userData = prepareUserData(userData);
     User.findOne({ username: userData.username })
       .then((attemptedUser) => {
         if (attemptedUser) {
@@ -87,6 +92,52 @@ exports.login = function (userData) {
       })
       .catch((e) => {
         reject("Failed login attempt.");
+      });
+  });
+};
+
+exports.findByUsername = function (userData) {
+  return new Promise(async (resolve, reject) => {
+    userData = prepareUserData(userData);
+    User.findOne({ username: userData.username })
+      .then((foundUser) => {
+        if (foundUser) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((e) => {
+        reject("Error in finding user by username.");
+      });
+  });
+};
+
+exports.findByEmail = function (userData) {
+  return new Promise(async (resolve, reject) => {
+    userData = prepareUserData(userData);
+    User.findOne({ email: userData.email })
+      .then((foundUser) => {
+        if (foundUser) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((e) => {
+        reject("Error in finding user by email.");
+      });
+  });
+};
+
+exports.deleteAccount = function (id) {
+  return new Promise(async (resolve, reject) => {
+    User.findByIdAndDelete({ _id: id })
+      .then(() => {
+        resolve("Account has been removed");
+      })
+      .catch((e) => {
+        reject("Error in deleting user.");
       });
   });
 };
