@@ -1,4 +1,5 @@
 const userService = require("../services/userService");
+const followService = require("../services/followService");
 const jwt = require("jsonwebtoken");
 
 // Token lasts for 2 weeks
@@ -98,4 +99,24 @@ exports.deleteAccount = async (req, res) => {
     .catch((err) => {
       res.status(500).send(err);
     });
+};
+
+exports.getFollowers = async function (req, res) {
+  try {
+    const user = await userService.findByUsername(req.params);
+    const followers = await followService.getFollowersById(user._id);
+    res.json(followers);
+  } catch (e) {
+    res.status(500).send("Error");
+  }
+};
+
+exports.getFollowing = async function (req, res) {
+  try {
+    const user = await userService.findByUsername(req.params);
+    const following = await followService.getFollowingById(user._id);
+    res.json(following);
+  } catch (e) {
+    res.status(500).send("Error");
+  }
 };

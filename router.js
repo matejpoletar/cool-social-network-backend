@@ -22,5 +22,7 @@ apiRouter.delete("/post/:id/delete", userController.isLoggedIn, postController.d
 
 apiRouter.post("/profile/:username/follow", userController.isLoggedIn, userController.ifUserExists, followController.addFollow);
 apiRouter.delete("/profile/:username/unfollow", userController.isLoggedIn, userController.ifUserExists, followController.removeFollow);
+apiRouter.get("/profile/:username/followers", userController.ifUserExists, userController.getFollowers);
+apiRouter.get("/profile/:username/following", userController.ifUserExists, userController.getFollowing);
 
 module.exports = apiRouter;
