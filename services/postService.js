@@ -1,4 +1,5 @@
 const { Post } = require("../models/Post");
+const { ObjectId } = require("mongodb");
 
 exports.createPost = function (data, userId) {
   return new Promise(async (resolve, reject) => {
@@ -49,10 +50,18 @@ exports.deletePost = function (postId, currentUserId) {
 exports.findSinglePostById = function (postId) {
   return new Promise(async (resolve, reject) => {
     try {
-      const post = await Post.findById(postId);
-      resolve(post);
+      let posts = await Post.aggregate()
+        .match({ _id: new ObjectId(postId) })
+        .lookup({ from: "users", localField: "author", foreignField: "_id", as: "authorDocument" })
+        .project({ title: 1, content: 1, createdDate: 1, authorId: "$author", author: { $arrayElemAt: ["$authorDocument", 0] } });
+
+      if (posts.length == 1) {
+        resolve(posts[0]);
+      } else {
+        reject("Post has not been found");
+      }
     } catch {
-      resolve("Error in finding post by id.");
+      reject("Error in finding post by id.");
     }
   });
 };

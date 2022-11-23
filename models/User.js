@@ -10,7 +10,8 @@ const User = mongoose.model(
       type: Date,
       default: Date.now,
     },
-  })
+  }),
+  "users"
 );
 
 module.exports.User = User;
