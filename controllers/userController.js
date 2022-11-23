@@ -68,12 +68,15 @@ exports.checkIfEmailExists = async (req, res) => {
 exports.ifUserExists = function (req, res, next) {
   userService
     .findByUsername(req.params)
-    .then(function (userDocument) {
-      req.profileUser = userDocument;
-      next();
+    .then((userExists) => {
+      if (userExists) {
+        next();
+      } else {
+        res.status(400).send("Username does not exist.");
+      }
     })
-    .catch(function (e) {
-      res.json(false);
+    .catch((err) => {
+      res.json(err);
     });
 };
 

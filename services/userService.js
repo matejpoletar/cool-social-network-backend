@@ -102,7 +102,7 @@ exports.findByUsername = function (userData) {
     User.findOne({ username: userData.username })
       .then((foundUser) => {
         if (foundUser) {
-          resolve(true);
+          resolve(foundUser);
         } else {
           resolve(false);
         }
@@ -119,7 +119,7 @@ exports.findByEmail = function (userData) {
     User.findOne({ email: userData.email })
       .then((foundUser) => {
         if (foundUser) {
-          resolve(true);
+          resolve(foundUser);
         } else {
           resolve(false);
         }

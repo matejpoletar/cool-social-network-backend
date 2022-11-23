@@ -4,6 +4,7 @@ const apiRouter = express.Router();
 
 const userController = require("./controllers/userController");
 const postController = require("./controllers/postController");
+const followController = require("./controllers/followController");
 
 apiRouter.get("/", (req, res) => res.send("Welcome to the Cool Social Network!"));
 
@@ -15,8 +16,11 @@ apiRouter.post("/check-email", userController.checkIfEmailExists);
 apiRouter.delete("/delete-account", userController.isLoggedIn, userController.deleteAccount);
 
 apiRouter.post("/post", userController.isLoggedIn, postController.createPost);
+apiRouter.get("/post/:id", postController.getPostById);
 apiRouter.post("/post/:id/update", userController.isLoggedIn, postController.updatePost);
 apiRouter.delete("/post/:id/delete", userController.isLoggedIn, postController.deletePost);
-apiRouter.get("/post/:id", postController.getPostById);
+
+apiRouter.post("/profile/:username/follow", userController.isLoggedIn, userController.ifUserExists, followController.addFollow);
+apiRouter.delete("/profile/:username/unfollow", userController.isLoggedIn, userController.ifUserExists, followController.removeFollow);
 
 module.exports = apiRouter;
