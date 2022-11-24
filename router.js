@@ -16,10 +16,12 @@ apiRouter.post("/check-email", userController.checkIfEmailExists);
 apiRouter.delete("/delete-account", userController.isLoggedIn, userController.deleteAccount);
 
 apiRouter.post("/post", userController.isLoggedIn, postController.createPost);
-apiRouter.get("/post/:id", postController.getPostById);
+apiRouter.get("/post/:id", userController.isLoggedIn, postController.getPostById);
 apiRouter.post("/post/:id/update", userController.isLoggedIn, postController.updatePost);
 apiRouter.delete("/post/:id/delete", userController.isLoggedIn, postController.deletePost);
 
+apiRouter.get("/profile/:username", userController.isLoggedIn, userController.ifUserExists, userController.getUserData);
+apiRouter.get("/profile/:username/posts", userController.isLoggedIn, userController.ifUserExists, userController.getAllUserPosts);
 apiRouter.post("/profile/:username/follow", userController.isLoggedIn, userController.ifUserExists, followController.addFollow);
 apiRouter.delete("/profile/:username/unfollow", userController.isLoggedIn, userController.ifUserExists, followController.removeFollow);
 apiRouter.get("/profile/:username/followers", userController.ifUserExists, userController.getFollowers);

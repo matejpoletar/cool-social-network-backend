@@ -6,7 +6,7 @@ const Post = mongoose.model(
   new mongoose.Schema({
     title: String,
     content: String,
-    author: ObjectId,
+    authorId: ObjectId,
     createdAt: {
       type: Date,
       default: Date.now,

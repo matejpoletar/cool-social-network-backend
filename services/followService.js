@@ -72,3 +72,28 @@ exports.getFollowingById = function (userId) {
     }
   });
 };
+
+exports.getNumberFollowers = function (userId) {
+  return new Promise(async (resolve, reject) => {
+    const followerCount = await Follow.countDocuments({ followedUser: userId });
+    resolve(followerCount);
+  });
+};
+
+exports.getNumberFollowing = function (userId) {
+  return new Promise(async (resolve, reject) => {
+    const followingCount = await Follow.countDocuments({ userId: userId });
+    resolve(followingCount);
+  });
+};
+
+exports.isFollowing = function (followingId, userId) {
+  return new Promise(async (resolve, reject) => {
+    const follow = await Follow.findOne({ followedUser: followingId, userId: userId });
+    if (follow) {
+      resolve(true);
+    } else {
+      resolve(false);
+    }
+  });
+};

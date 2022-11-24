@@ -8,7 +8,7 @@ exports.createPost = function (data, userId) {
       post = new Post({
         title: data.title,
         content: data.content,
-        author: userId,
+        authorId: userId,
       });
 
       await Post.create(post);
@@ -26,7 +26,7 @@ exports.updatePost = function (data, postId) {
       await Post.findByIdAndUpdate(postId, { $set: { title: data.title, body: data.body } });
       resolve("Successfully updated post!");
     } else {
-      resolve("Error in updating post.");
+      reject("Error in updating post.");
     }
   });
 };
@@ -35,7 +35,7 @@ exports.deletePost = function (postId, currentUserId) {
   return new Promise(async (resolve, reject) => {
     try {
       let post = await Post.findById(postId);
-      if (post.author.equals(currentUserId)) {
+      if (post.authorId.equals(currentUserId)) {
         await Post.deleteOne({ _id: postId });
         resolve("Post deleted.");
       } else {
@@ -52,8 +52,14 @@ exports.findSinglePostById = function (postId) {
     try {
       let posts = await Post.aggregate()
         .match({ _id: new ObjectId(postId) })
-        .lookup({ from: "users", localField: "author", foreignField: "_id", as: "authorDocument" })
-        .project({ title: 1, content: 1, createdDate: 1, authorId: "$author", author: { $arrayElemAt: ["$authorDocument", 0] } });
+        .lookup({ from: "users", localField: "authorId", foreignField: "_id", as: "authorDocument" })
+        .project({
+          title: 1,
+          content: 1,
+          createdAt: 1,
+          authorId: "$authorId",
+          author: { username: { $arrayElemAt: ["$authorDocument.username", 0] }, email: { $arrayElemAt: ["$authorDocument.email", 0] } },
+        });
 
       if (posts.length == 1) {
         resolve(posts[0]);
@@ -62,6 +68,24 @@ exports.findSinglePostById = function (postId) {
       }
     } catch {
       reject("Error in finding post by id.");
+    }
+  });
+};
+
+exports.countPostsByAuthor = function (authorId) {
+  return new Promise(async (resolve, reject) => {
+    const postCount = await Post.countDocuments({ authorId: authorId });
+    resolve(postCount);
+  });
+};
+
+exports.getAllPostsByAuthorId = function (authorId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const posts = await Post.find({ authorId: new ObjectId(authorId) });
+      resolve(posts);
+    } catch {
+      reject("Error in fetching posts.");
     }
   });
 };
