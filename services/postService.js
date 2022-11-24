@@ -1,5 +1,6 @@
 const { Post } = require("../models/Post");
 const { ObjectId } = require("mongodb");
+const followService = require("../services/followService");
 
 exports.createPost = function (data, userId) {
   return new Promise(async (resolve, reject) => {
@@ -50,15 +51,20 @@ exports.deletePost = function (postId, currentUserId) {
 exports.findSinglePostById = function (postId) {
   return new Promise(async (resolve, reject) => {
     try {
-      let posts = await Post.aggregate()
+      const posts = await Post.aggregate()
         .match({ _id: new ObjectId(postId) })
         .lookup({ from: "users", localField: "authorId", foreignField: "_id", as: "authorDocument" })
         .project({
+          _id: 0,
+          id: "$_id",
           title: 1,
           content: 1,
           createdAt: 1,
-          authorId: "$authorId",
-          author: { username: { $arrayElemAt: ["$authorDocument.username", 0] }, email: { $arrayElemAt: ["$authorDocument.email", 0] } },
+          author: {
+            authorId: "$authorId",
+            username: { $arrayElemAt: ["$authorDocument.username", 0] },
+            email: { $arrayElemAt: ["$authorDocument.email", 0] },
+          },
         });
 
       if (posts.length == 1) {
@@ -86,6 +92,36 @@ exports.getAllPostsByAuthorId = function (authorId) {
       resolve(posts);
     } catch {
       reject("Error in fetching posts.");
+    }
+  });
+};
+
+exports.getAllFollowingPosts = async function (userId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let followedUsers = await followService.getFollowingById(userId);
+      followedUsers = followedUsers.map((followDoc) => {
+        return followDoc.id;
+      });
+      const posts = Post.aggregate()
+        .match({ authorId: { $in: followedUsers } })
+        .lookup({ from: "users", localField: "authorId", foreignField: "_id", as: "authorDocument" })
+        .project({
+          _id: 0,
+          id: "$_id",
+          title: 1,
+          content: 1,
+          createdAt: 1,
+          author: {
+            authorId: "$authorId",
+            username: { $arrayElemAt: ["$authorDocument.username", 0] },
+            email: { $arrayElemAt: ["$authorDocument.email", 0] },
+          },
+        })
+        .sort({ createdAt: -1 });
+      resolve(posts);
+    } catch {
+      reject("Error in fetching feed.");
     }
   });
 };

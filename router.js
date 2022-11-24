@@ -20,6 +20,7 @@ apiRouter.get("/post/:id", userController.isLoggedIn, postController.getPostById
 apiRouter.post("/post/:id/update", userController.isLoggedIn, postController.updatePost);
 apiRouter.delete("/post/:id/delete", userController.isLoggedIn, postController.deletePost);
 
+apiRouter.get("/home", userController.isLoggedIn, userController.getAllFollowingPosts);
 apiRouter.get("/profile/:username", userController.isLoggedIn, userController.ifUserExists, userController.getUserData);
 apiRouter.get("/profile/:username/posts", userController.isLoggedIn, userController.ifUserExists, userController.getAllUserPosts);
 apiRouter.post("/profile/:username/follow", userController.isLoggedIn, userController.ifUserExists, followController.addFollow);

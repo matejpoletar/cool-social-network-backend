@@ -41,6 +41,8 @@ exports.getFollowersById = function (userId) {
         { $lookup: { from: "users", localField: "userId", foreignField: "_id", as: "userDoc" } },
         {
           $project: {
+            _id: 0,
+            id: { $arrayElemAt: ["$userDoc._id", 0] },
             username: { $arrayElemAt: ["$userDoc.username", 0] },
             email: { $arrayElemAt: ["$userDoc.email", 0] },
           },
@@ -61,6 +63,8 @@ exports.getFollowingById = function (userId) {
         { $lookup: { from: "users", localField: "followedUser", foreignField: "_id", as: "userDoc" } },
         {
           $project: {
+            _id: 0,
+            id: { $arrayElemAt: ["$userDoc._id", 0] },
             username: { $arrayElemAt: ["$userDoc.username", 0] },
             email: { $arrayElemAt: ["$userDoc.email", 0] },
           },

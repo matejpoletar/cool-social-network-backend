@@ -161,3 +161,15 @@ exports.getAllUserPosts = async function (req, res) {
     res.status(500).send(err);
   }
 };
+
+exports.getAllFollowingPosts = async function (req, res) {
+  try {
+    const posts = await postService.getAllFollowingPosts(req.apiUser.id);
+    res.json({
+      data: posts,
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
