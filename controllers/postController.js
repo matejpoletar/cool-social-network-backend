@@ -3,8 +3,8 @@ const postService = require("../services/postService");
 exports.createPost = function (req, res) {
   postService
     .createPost(req.body, req.apiUser.id)
-    .then((data) => {
-      res.json({ data: data, status: "success" });
+    .then((post) => {
+      res.json(post);
     })
     .catch((err) => {
       res.json(err);

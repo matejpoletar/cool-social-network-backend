@@ -83,11 +83,11 @@ exports.login = function (userData) {
           hash.update(userData.password);
           const passwordHash = hash.digest("hex").toUpperCase();
           if (passwordHash !== attemptedUser.password) {
-            reject("Invalid password.");
+            resolve({ user: null, message: "Invalid password." });
           }
-          resolve(attemptedUser);
+          resolve({ user: attemptedUser, message: "Successful login." });
         } else {
-          reject("Invalid username.");
+          resolve({ user: null, message: "Invalid username." });
         }
       })
       .catch((e) => {
@@ -101,11 +101,7 @@ exports.findByUsername = function (userData) {
     userData = prepareUserData(userData);
     User.findOne({ username: userData.username })
       .then((foundUser) => {
-        if (foundUser) {
-          resolve(foundUser);
-        } else {
-          resolve(false);
-        }
+        resolve(foundUser);
       })
       .catch((e) => {
         reject("Error in finding user by username.");
@@ -118,11 +114,7 @@ exports.findByEmail = function (userData) {
     userData = prepareUserData(userData);
     User.findOne({ email: userData.email })
       .then((foundUser) => {
-        if (foundUser) {
-          resolve(foundUser);
-        } else {
-          resolve(false);
-        }
+        resolve(foundUser);
       })
       .catch((e) => {
         reject("Error in finding user by email.");

@@ -24,7 +24,7 @@ exports.updatePost = function (data, postId) {
   return new Promise(async (resolve, reject) => {
     const errors = [];
     if (!errors.length) {
-      await Post.findByIdAndUpdate(postId, { $set: { title: data.title, body: data.body } });
+      await Post.findByIdAndUpdate(postId, { $set: { title: data.title, content: data.content } });
       resolve("Successfully updated post!");
     } else {
       reject("Error in updating post.");
@@ -88,7 +88,7 @@ exports.countPostsByAuthor = function (authorId) {
 exports.getAllPostsByAuthorId = function (authorId) {
   return new Promise(async (resolve, reject) => {
     try {
-      const posts = await Post.find({ authorId: new ObjectId(authorId) });
+      const posts = await Post.find({ authorId: new ObjectId(authorId) }).sort({ createdAt: -1 });
       resolve(posts);
     } catch {
       reject("Error in fetching posts.");
