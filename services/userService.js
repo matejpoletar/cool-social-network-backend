@@ -96,6 +96,18 @@ exports.login = function (userData) {
   });
 };
 
+exports.findById = function (id) {
+  return new Promise(async (resolve, reject) => {
+    User.findOne({ _id: id })
+      .then((foundUser) => {
+        resolve(foundUser);
+      })
+      .catch((e) => {
+        reject("Error in finding user by username.");
+      });
+  });
+};
+
 exports.findByUsername = function (userData) {
   return new Promise(async (resolve, reject) => {
     userData = prepareUserData(userData);

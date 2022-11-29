@@ -20,6 +20,7 @@ apiRouter.post("/check-username", userController.checkIfUsernameExists);
 apiRouter.post("/check-email", userController.checkIfEmailExists);
 apiRouter.post("/profile-image", upload.single("file"), userController.isLoggedIn, userController.setProfileImage);
 apiRouter.delete("/delete-account", userController.isLoggedIn, userController.deleteAccount);
+apiRouter.post("/search", userController.isLoggedIn, postController.search);
 
 apiRouter.post("/post", userController.isLoggedIn, postController.createPost);
 apiRouter.get("/post/:id", postController.getPostById);

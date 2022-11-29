@@ -1,16 +1,16 @@
 const { Post } = require("../models/Post");
 const { ObjectId } = require("mongodb");
 const followService = require("../services/followService");
-const userService = require("../services/userService");
 
-exports.createPost = function (data, userId) {
+exports.createPost = function (data, user) {
   return new Promise(async (resolve, reject) => {
     const errors = [];
     if (!errors.length) {
       post = new Post({
         title: data.title,
         content: data.content,
-        authorId: userId,
+        authorId: user._id,
+        author: user.username,
       });
 
       await Post.create(post);
@@ -125,6 +125,41 @@ exports.getAllFollowingPosts = async function (userId) {
       resolve(posts);
     } catch {
       reject("Error in fetching feed.");
+    }
+  });
+};
+
+exports.search = function (body) {
+  console.log(body);
+  return new Promise(async (resolve, reject) => {
+    if (typeof body.keyword == "string") {
+      try {
+        const posts = await Post.aggregate([
+          { $match: { $text: { $search: body.keyword } } },
+          { $lookup: { from: "users", localField: "authorId", foreignField: "_id", as: "authorDocument" } },
+          {
+            $project: {
+              _id: 0,
+              id: "$_id",
+              title: 1,
+              content: 1,
+              createdAt: 1,
+              author: {
+                authorId: "$authorId",
+                username: { $arrayElemAt: ["$authorDocument.username", 0] },
+                email: { $arrayElemAt: ["$authorDocument.email", 0] },
+                avatar: { $arrayElemAt: ["$authorDocument.profileImgUrl", 0] },
+              },
+            },
+          },
+          { $sort: { score: { $meta: "textScore" } } },
+        ]);
+        resolve(posts);
+      } catch {
+        reject("Error in search.");
+      }
+    } else {
+      reject();
     }
   });
 };

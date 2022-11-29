@@ -1,8 +1,10 @@
 const postService = require("../services/postService");
+const userService = require("../services/userService");
 
-exports.createPost = function (req, res) {
+exports.createPost = async function (req, res) {
+  const user = await userService.findById(req.apiUser.id);
   postService
-    .createPost(req.body, req.apiUser.id)
+    .createPost(req.body, user)
     .then((post) => {
       res.json(post);
     })
@@ -34,10 +36,23 @@ exports.deletePost = function (req, res) {
 };
 
 exports.getPostById = async function (req, res) {
-  try {
-    let post = await postService.findSinglePostById(req.params.id);
-    res.json(post);
-  } catch (err) {
-    res.json(err);
-  }
+  postService
+    .findSinglePostById(req.params.id)
+    .then((post) => {
+      res.json(post);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+};
+
+exports.search = async function (req, res) {
+  postService
+    .search(req.body)
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 };
