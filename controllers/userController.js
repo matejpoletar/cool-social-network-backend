@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
     .then((user) => {
       res.json({
         token: jwt.sign({ id: user._id, username: user.username }, process.env.JWTSECRET, { expiresIn: tokenExpiresIn }),
-        data: user,
+        user: user,
         status: "success",
       });
     })
@@ -142,7 +142,6 @@ exports.getUserData = async function (req, res) {
   try {
     const user = await userService.findByUsername(req.params);
     const postsCountPromise = postService.countPostsByAuthor(user._id);
-    console.log(req.apiUser);
     const isFollowingPromise = followService.isFollowing(user._id, req.apiUser.id);
     const followersCountPromise = followService.getNumberFollowers(user._id);
     const followingCountPromise = followService.getNumberFollowing(user._id);
@@ -151,6 +150,7 @@ exports.getUserData = async function (req, res) {
       username: user.username,
       email: user.email,
       isFollowing: isFollowing,
+      profileImgUrl: user.profileImgUrl,
       counts: {
         postsCount: postsCount,
         followersCount: followersCount,
@@ -179,4 +179,26 @@ exports.getAllFollowingPosts = async function (req, res) {
   } catch (err) {
     res.status(500).send(err);
   }
+};
+
+exports.setProfileImage = async (req, res) => {
+  try {
+    const image = await userService.setProfileImage(req.file);
+    await userService.updateImgUrl(req.apiUser.id, image);
+    res.send(image);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
+exports.updateImageUrl = async (req, res) => {
+  userService
+    .updateImgUrl(req.apiUser.id, req.imgFile)
+    .then((result) => {
+      console.log(result);
+      res.send(result);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 };

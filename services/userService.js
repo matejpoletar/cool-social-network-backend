@@ -126,10 +126,43 @@ exports.deleteAccount = function (id) {
   return new Promise(async (resolve, reject) => {
     User.findByIdAndDelete({ _id: id })
       .then(() => {
-        resolve("Account has been removed");
+        resolve("Account has been removed.");
       })
       .catch((e) => {
         reject("Error in deleting user.");
+      });
+  });
+};
+
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+
+exports.setProfileImage = function (filename) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  return new Promise(async (resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream((err, res) => {
+      if (res) {
+        resolve(res);
+      } else {
+        reject(err);
+      }
+    });
+    streamifier.createReadStream(filename.buffer).pipe(stream);
+  });
+};
+
+exports.updateImgUrl = function (id, imgFile) {
+  return new Promise(async (resolve, reject) => {
+    User.findByIdAndUpdate({ _id: id }, { profileImgUrl: imgFile.secure_url })
+      .then((user) => {
+        resolve(user);
+      })
+      .catch(() => {
+        reject("Error in uploading new profile image.");
       });
   });
 };

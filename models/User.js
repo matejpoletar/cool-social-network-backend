@@ -6,6 +6,7 @@ const User = mongoose.model(
     username: String,
     password: String,
     email: String,
+    profileImgUrl: String,
     createdAt: {
       type: Date,
       default: Date.now,

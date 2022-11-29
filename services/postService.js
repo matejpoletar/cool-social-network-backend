@@ -1,6 +1,7 @@
 const { Post } = require("../models/Post");
 const { ObjectId } = require("mongodb");
 const followService = require("../services/followService");
+const userService = require("../services/userService");
 
 exports.createPost = function (data, userId) {
   return new Promise(async (resolve, reject) => {
@@ -64,6 +65,7 @@ exports.findSinglePostById = function (postId) {
             authorId: "$authorId",
             username: { $arrayElemAt: ["$authorDocument.username", 0] },
             email: { $arrayElemAt: ["$authorDocument.email", 0] },
+            avatar: { $arrayElemAt: ["$authorDocument.profileImgUrl", 0] },
           },
         });
 
@@ -103,7 +105,7 @@ exports.getAllFollowingPosts = async function (userId) {
       followedUsers = followedUsers.map((followDoc) => {
         return followDoc.id;
       });
-      const posts = Post.aggregate()
+      let posts = await Post.aggregate()
         .match({ authorId: { $in: followedUsers } })
         .lookup({ from: "users", localField: "authorId", foreignField: "_id", as: "authorDocument" })
         .project({
@@ -113,9 +115,10 @@ exports.getAllFollowingPosts = async function (userId) {
           content: 1,
           createdAt: 1,
           author: {
-            authorId: "$authorId",
+            id: { $arrayElemAt: ["$authorDocument._id", 0] },
             username: { $arrayElemAt: ["$authorDocument.username", 0] },
-            email: { $arrayElemAt: ["$authorDocument.email", 0] },
+            createdAt: { $arrayElemAt: ["$authorDocument.createdAt", 0] },
+            avatar: { $arrayElemAt: ["$authorDocument.profileImgUrl", 0] },
           },
         })
         .sort({ createdAt: -1 });
