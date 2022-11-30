@@ -21,12 +21,17 @@ exports.createPost = function (data, user) {
   });
 };
 
-exports.updatePost = function (data, postId) {
+exports.updatePost = function (data, currentUserId, postId) {
   return new Promise(async (resolve, reject) => {
     const errors = [];
     if (!errors.length) {
-      await Post.findByIdAndUpdate(postId, { $set: { title: data.title, content: data.content } });
-      resolve("Successfully updated post!");
+      let post = await Post.findById(postId);
+      if (post.authorId.equals(currentUserId)) {
+        await Post.findByIdAndUpdate(postId, { $set: { title: data.title, content: data.content } });
+        resolve("Successfully updated post!");
+      } else {
+        reject("You don't have permission to update that post.");
+      }
     } else {
       reject("Error in updating post.");
     }
@@ -130,7 +135,6 @@ exports.getAllFollowingPosts = async function (userId) {
 };
 
 exports.search = function (body) {
-  console.log(body);
   return new Promise(async (resolve, reject) => {
     if (typeof body.keyword == "string") {
       try {

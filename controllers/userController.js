@@ -195,7 +195,6 @@ exports.updateImageUrl = async (req, res) => {
   userService
     .updateImgUrl(req.apiUser.id, req.imgFile)
     .then((result) => {
-      console.log(result);
       res.send(result);
     })
     .catch((err) => {

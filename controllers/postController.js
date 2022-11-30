@@ -15,7 +15,7 @@ exports.createPost = async function (req, res) {
 
 exports.updatePost = function (req, res) {
   postService
-    .updatePost(req.body, req.params.id)
+    .updatePost(req.body, req.apiUser.id, req.params.id)
     .then((updateSuccess) => {
       res.json(updateSuccess);
     })
