@@ -7,6 +7,7 @@ const Post = mongoose.model(
     title: String,
     content: String,
     authorId: ObjectId,
+    author: String,
     createdAt: {
       type: Date,
       default: Date.now,
